@@ -58,24 +58,6 @@ pnpm add @vue/composition-api
 
 ### Vue3
 
-#### 单独引入
-> 推荐使用，因为对 tree-shaking 有更好的支持。
-```vue
-<script setup>
-import { CodeDiff } from 'v-code-diff'
-</script>
-
-<template>
-  <div>
-    <CodeDiff
-      old-string="12345"
-      new-string="3456"
-      output-format="side-by-side"
-    />
-  </div>
-</template>
-```
-
 #### 注册为全局组件
 
 ```ts
@@ -97,37 +79,24 @@ app.use(CodeDiff).mount('#app')
 </template>
 ```
 
+#### 单独引入
+
+不推荐，但保留相关能力，方便 0.x 用户迁移
+
 ### Vue2
 
-#### 单独引入
-> 推荐使用，因为对 tree-shaking 有更好的支持。
-```vue
-<script>
-import { CodeDiff } from 'v-code-diff'
-export default {
-  components: {
-    CodeDiff
-  }
-}
-</script>
-
-<template>
-  <div>
-    <CodeDiff
-      old-string="12345"
-      new-string="3456"
-      output-format="side-by-side"
-    />
-  </div>
-</template>
-```
 #### 注册为全局组件
+
 ```ts
 import Vue from 'vue'
 import CodeDiff from 'v-code-diff'
 
 Vue.use(CodeDiff)
 ```
+
+#### 单独引入
+
+不推荐，但保留相关能力，方便 0.x 用户迁移
 
 ## Demo
 
@@ -139,24 +108,23 @@ Vue.use(CodeDiff)
 
 ## 组件属性
 
-| 参数                  | 说明                                                                                                                 | 类型        | 可选值                       | 默认值          |
-|---------------------|--------------------------------------------------------------------------------------------------------------------|-----------|---------------------------|--------------|
-| language            | 代码语言，如`typescript`，默认纯文本。 [查看全部支持语言](https://github.com/highlightjs/highlight.js/blob/main/SUPPORTED_LANGUAGES.md) | string    | -                         | plaintext    |
-| oldString           | 旧的字符串                                                                                                              | string    | -                         | -            |
-| newString           | 新的字符串                                                                                                              | string    | -                         | -            |
-| context             | 不同地方上下间隔多少行不隐藏                                                                                                     | number    | -                         | 10           |
-| outputFormat        | 展示方式                                                                                                               | string    | line-by-line，side-by-side | line-by-line |
-| diffStyle           | 差异风格, 单词级差异或字母级差异                                                                                                  | string    | word, char                | word         |
-|forceInlineComparison| 细分差异；存在差异时，强制进行行内对比（word 或 char 级）                                                                                | boolean   | -                         | false        |
-| trim                | 移除字符串前后空白字符                                                                                                        | boolean   | -                         | false        |
-| noDiffLineFeed      | 不 diff windows 换行符(CRLF)与 linux 换行符(LF)                                                                            | boolean   | -                         | false        |
-| maxHeight           | 组件最大高度，例如 300px                                                                                                    | string    | -                         | undefined    |
-| filename            | 文件名                                                                                                                | string    | -                         | undefined    |
-| newFilename         | 新文件文件名                                                                                                             | string    | -                         | undefined    |
-| hideHeader          | 隐藏头部栏                                                                                                              | boolean   | -                         | false        |
-| hideStat            | 隐藏头部栏中的统计信息                                                                                                        | boolean   | -                         | false        |
-| theme               | 用于切换日间模式/夜间模式                                                                                                      | ThemeType | light , dark              | light        |
-| ignoreMatchingLines | 给出一个模式来忽略匹配行，例如：'(time\|token)'                                                                                    | string    | -                         |              |
+| 参数           | 说明                                                                                                                                    | 类型      | 可选值                     | 默认值       |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------- | --------- | -------------------------- | ------------ |
+| language       | 代码语言，如`typescript`，默认纯文本。 [查看全部支持语言](https://github.com/highlightjs/highlight.js/blob/main/SUPPORTED_LANGUAGES.md) | string    | -                          | plaintext    |
+| oldString      | 旧的字符串                                                                                                                              | string    | -                          | -            |
+| newString      | 新的字符串                                                                                                                              | string    | -                          | -            |
+| context        | 不同地方上下间隔多少行不隐藏                                                                                                            | number    | -                          | 10           |
+| outputFormat   | 展示方式                                                                                                                                | string    | line-by-line，side-by-side | line-by-line |
+| diffStyle      | 差异风格, 单词级差异或字母级差异                                                                                                        | string    | word, char                 | word         |
+| trim           | 移除字符串前后空白字符                                                                                                                  | boolean   | -                          | false        |
+| noDiffLineFeed | 不 diff windows 换行符(CRLF)与 linux 换行符(LF)                                                                                         | boolean   | -                          | false        |
+| maxHeight      | 组件最大高度，例如 300px                                                                                                                | string    | -                          | undefined    |
+| filename       | 文件名                                                                                                                                  | string    | -                          | undefined    |
+| newFilename    | 新文件文件名                                                                                                                   | string    | -                          | undefined    |
+| hideHeader | 隐藏头部栏 | boolean | - | false |
+| hideStat | 隐藏头部栏中的统计信息 | boolean | - | false |
+| theme          | 用于切换日间模式/夜间模式                                                                                                               | ThemeType | light , dark               | light      |
+| ignoreMatchingLines | 给出一个模式来忽略匹配行，例如：'(time\|token)' | string | - |  |
 
 ## 组件事件
 
@@ -189,39 +157,13 @@ Vue.use(CodeDiff)
 ```shell
 pnpm add highlight.js
 ```
-#### 单独引入
-> 推荐使用，因为对 tree-shaking 有更好的支持。
-```vue
-<script>
-import { CodeDiff, hljs } from 'v-code-diff'
-import c from 'highlight.js/lib/languages/c'
-// Extend C language
-hljs.registerLanguage('c', c)
-export default {
-  components: {
-    CodeDiff,
-  }
-}
-</script>
 
-<template>
-  <div>
-    <CodeDiff
-      old-string="#include <stdio.h>"
-      new-string="#include <stdio.h>\nint a = 1;"
-      output-format="side-by-side"
-      language="c"
-    />
-  </div>
-</template>
-```
-#### 全局注册
 ```typescript
-import CodeDiff from "v-code-diff"
+import CodeDiff from "v-code-diff";
 // Extend C language
-import c from "highlight.js/lib/languages/c"
+import c from "highlight.js/lib/languages/c";
 
-CodeDiff.hljs.registerLanguage("c", c)
+CodeDiff.hljs.registerLanguage("c", c);
 ```
 
 ## 从 0.x 版本迁移

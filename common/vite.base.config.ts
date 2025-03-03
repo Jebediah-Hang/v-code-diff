@@ -4,7 +4,9 @@ import { defineConfig } from 'vite'
 import { isVue2 } from 'vue-demi'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 
-const umd = process.env.format === 'umd'
+// const umd = process.env.format === 'umd'
+const umd = process.argv.at(-1) === '--format=umd'
+// console.log(process.argv.at(-1))
 
 const outputName = 'index'
 export const defaultPlugins = [

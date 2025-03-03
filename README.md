@@ -22,6 +22,7 @@ This project references the following projects, and I would like to express my g
 - Github Code Diff
 
 ## Contents
+
 - [Install](#Install)
 - [Getting started](#Getting-started)
   - [Vue3](#Vue3)
@@ -57,24 +58,6 @@ pnpm add @vue/composition-api
 
 ### Vue3
 
-#### Register locally
-> Recommend using local registration for better tree-shaking support.
-```vue
-<script setup>
-import { CodeDiff } from 'v-code-diff'
-</script>
-
-<template>
-  <div>
-    <CodeDiff
-      old-string="12345"
-      new-string="3456"
-      output-format="side-by-side"
-    />
-  </div>
-</template>
-```
-
 #### Register globally
 
 ```ts
@@ -98,37 +81,24 @@ then
 </template>
 ```
 
+#### Register locally
+
+Not recommended, but the relevant capabilities are retained to facilitate migration for 0.x users.
+
 ### Vue2
 
-#### Register locally
-> Recommend using local registration for better tree-shaking support.
-```vue
-<script>
-import { CodeDiff } from 'v-code-diff'
-export default {
-  components: {
-    CodeDiff
-  }
-}
-</script>
-
-<template>
-  <div>
-    <CodeDiff
-      old-string="12345"
-      new-string="3456"
-      output-format="side-by-side"
-    />
-  </div>
-</template>
-```
 #### Register globally
+
 ```ts
 import Vue from 'vue'
 import CodeDiff from 'v-code-diff'
 
 Vue.use(CodeDiff)
 ```
+
+#### Register locally
+
+Not recommended, but the relevant capabilities are retained to facilitate migration for 0.x users.
 
 ## Demo
 
@@ -140,24 +110,23 @@ Vue.use(CodeDiff)
 
 ## Props
 
-| Prop                | Description                                                                                                                                                             | Type      | Optional Values           | Default Value |
-|---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|---------------------------|---------------|
-| language            | Code language, such as typescript, defaults to plain text. [View all supported languages](https://github.com/highlightjs/highlight.js/blob/main/SUPPORTED_LANGUAGES.md) | string    | -                         | plaintext     |
-| oldString           | Old string                                                                                                                                                              | string    | -                         | -             |
-| newString           | New string                                                                                                                                                              | string    | -                         | -             |
-| context             | The number of lines to separate different parts so that they are not hidden                                                                                             | number    | -                         | 10            |
-| outputFormat        | Display mode                                                                                                                                                            | string    | line-by-line，side-by-side | line-by-line  |
-| diffStyle           | Difference style, word-level differences or letter-level differences                                                                                                    | string    | word, char                | word          |
-|forceInlineComparison| Force inline comparison (word or char level)                                                                                                                            | boolean   | -                         | false         |
-| trim                | Remove blank characters at the beginning and end of the string                                                                                                          | boolean   | -                         | false         |
-| noDiffLineFeed      | Don't diff Windows line feed (CRLF) and Linux line feed (LF)                                                                                                            | boolean   | -                         | false         |
-| maxHeight           | Maximum height of component, for example: 300px                                                                                                                         | string    | -                         | undefined     |
-| filename            | Filename                                                                                                                                                                | string    | -                         | undefined     |
-| newFilename         | New filename                                                                                                                                                            | string    | -                         | undefined     |
-| hideHeader          | Hide header bar                                                                                                                                                         | boolean   | -                         | false         |
-| hideStat            | Hide statistical part in the header bar                                                                                                                                 | boolean   | -                         | false         |
-| theme               | Add dark mode                                                                                                                                                           | ThemeType | light , dark              | light         |
-| ignoreMatchingLines | Give a pattern to ignore matching lines eg: '(time\|token)'                                                                                                             | string    | -                         | undefined     |
+| Prop           | Description                                                                                                                                                             | Type      | Optional Values            | Default Value |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | -------------------------- | ------------- |
+| language       | Code language, such as typescript, defaults to plain text. [View all supported languages](https://github.com/highlightjs/highlight.js/blob/main/SUPPORTED_LANGUAGES.md) | string    | -                          | plaintext     |
+| oldString      | Old string                                                                                                                                                              | string    | -                          | -             |
+| newString      | New string                                                                                                                                                              | string    | -                          | -             |
+| context        | The number of lines to separate different parts so that they are not hidden                                                                                             | number    | -                          | 10            |
+| outputFormat   | Display mode                                                                                                                                                            | string    | line-by-line，side-by-side | line-by-line  |
+| diffStyle      | Difference style, word-level differences or letter-level differences                                                                                                    | string    | word, char                 | word          |
+| trim           | Remove blank characters at the beginning and end of the string                                                                                                          | boolean   | -                          | false         |
+| noDiffLineFeed | Don't diff Windows line feed (CRLF) and Linux line feed (LF)                                                                                                            | boolean   | -                          | false         |
+| maxHeight      | Maximum height of component, for example: 300px                                                                                                                         | string    | -                          | undefined     |
+| filename       | Filename                                                                                                                                                                | string    | -                          | undefined     |
+| newFilename    | New filename                                                                                                                                                            | string    | -                          | undefined     |
+| hideHeader | Hide header bar | boolean | - | false |
+| hideStat | Hide statistical part in the header bar | boolean | - | false |
+| theme          | Add dark mode                                                                                                                                                           | ThemeType | light , dark               | light       |
+| ignoreMatchingLines | Give a pattern to ignore matching lines eg: '(time\|token)' | string | - | undefined |
 
 ## Events
 
@@ -191,40 +160,13 @@ If the language you need is not included, you can manually import the relevant l
 ```shell
 pnpm add highlight.js
 ```
-#### Register locally
-> Recommend using local registration for better tree-shaking support.
-```vue
-<script>
-import { CodeDiff, hljs } from 'v-code-diff'
-import c from 'highlight.js/lib/languages/c'
-// Extend C language
-hljs.registerLanguage('c', c)
-export default {
-  components: {
-    CodeDiff,
-  }
-}
-</script>
 
-<template>
-  <div>
-    <CodeDiff
-      old-string="#include <stdio.h>"
-      new-string="#include <stdio.h>\nint a = 1;"
-      output-format="side-by-side"
-      language="c"
-    />
-  </div>
-</template>
-```
-
-#### Register globally
 ```typescript
-import CodeDiff from 'v-code-diff'
+import CodeDiff from 'v-code-diff';
 // Extend C language
-import c from 'highlight.js/lib/languages/c'
+import c from 'highlight.js/lib/languages/c';
 
-CodeDiff.hljs.registerLanguage('c', c)
+CodeDiff.hljs.registerLanguage('c', c);
 ```
 
 ## Migrate from 0.x version

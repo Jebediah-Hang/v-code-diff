@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { ref } from 'vue-demi';
 import type { SplitLineChange, SplitViewerChange } from '../types'
 import SplitLine from './SplitLine.vue'
 
 const props = defineProps<{
-  diffChange: SplitViewerChange
+  diffChange: SplitViewerChange,
+  context: number
 }>()
 
 function expandHandler({ hideIndex }: SplitLineChange) {
@@ -14,6 +16,18 @@ function expandHandler({ hideIndex }: SplitLineChange) {
     line.fold = false
   })
 }
+
+const splitViewEl = ref<HTMLElement | null>(null)
+
+function jumpToChange(line: number) {
+  const lineEl = splitViewEl.value?.children[line]
+  lineEl && lineEl.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
+defineExpose({
+  jumpToChange
+})
+
 </script>
 
 <template>
@@ -24,8 +38,14 @@ function expandHandler({ hideIndex }: SplitLineChange) {
       <col width="44">
       <col>
     </colgroup>
-    <tbody>
-      <SplitLine v-for="(item, index) in diffChange?.changes" :key="index" :split-line="item" @expand="expandHandler" />
+    <tbody ref="splitViewEl">
+      <SplitLine
+        v-for="(item, index) in diffChange?.changes"
+        :key="index"
+        :split-line="item"
+        :context="context"
+        @expand="expandHandler"
+      />
     </tbody>
   </table>
 </template>

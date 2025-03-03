@@ -7,7 +7,6 @@ function install(app: any) {
 
 export {
   CodeDiff,
-  hljs,
 }
 
 export default {

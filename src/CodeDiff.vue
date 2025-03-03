@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue-demi'
 import { createSplitDiff, createUnifiedDiff } from './utils'
+import { SplitViewerChange, DiffType } from './types'
 import UnifiedViewer from './unified/UnifiedViewer.vue'
 import SplitViewer from './split/SplitViewer.vue'
-import DownArrowIcon from './icons/DownArrowIcon.vue'
-import UpArrowIcon from './icons/UpArrowIcon.vue'
 
 import './style.scss'
 
@@ -14,7 +13,6 @@ interface Props {
   language?: string
   context?: number
   diffStyle?: 'word' | 'char'
-  forceInlineComparison?: boolean
   outputFormat?: 'line-by-line' | 'side-by-side'
   trim?: boolean
   noDiffLineFeed?: boolean
@@ -32,7 +30,6 @@ const props = withDefaults(defineProps<Props>(), {
   language: 'plaintext',
   context: 10,
   diffStyle: 'word',
-  forceInlineComparison: false,
   outputFormat: 'line-by-line',
   trim: false,
   noDiffLineFeed: false,
@@ -49,12 +46,16 @@ const emits = defineEmits<{
   (e: 'diff', diffResult: DiffResult): void
 }>()
 
+interface ChangeStat {
+  equalCont: number
+  onlyCont: number
+  changeCont: number
+  ignoreCont: number
+}
+
 interface DiffResult {
-  stat: {
-    isChanged: boolean
-    addNum: number
-    delNum: number
-  }
+  diffChange: Array<number>,
+  stat: ChangeStat
 }
 
 const isUnifiedViewer = computed(() => props.outputFormat === 'line-by-line')
@@ -74,49 +75,67 @@ const newString = computed(() => {
 
 const raw = computed(() =>
   isUnifiedViewer.value
-    ? createUnifiedDiff(oldString.value, newString.value, props.language, props.diffStyle, props.forceInlineComparison, props.context, props.ignoreMatchingLines)
-    : createSplitDiff(oldString.value, newString.value, props.language, props.diffStyle, props.forceInlineComparison, props.context, props.ignoreMatchingLines),
+    ? createUnifiedDiff(oldString.value, newString.value, props.language, props.diffStyle, props.context, props.ignoreMatchingLines)
+    : createSplitDiff(oldString.value, newString.value, props.language, props.diffStyle, props.context, props.ignoreMatchingLines),
 )
 const diffChange = ref(raw.value)
-const isNotChanged = computed(() => diffChange.value.stat.additionsNum === 0 && diffChange.value.stat.deletionsNum === 0)
+// const isNotChanged = computed(() => diffChange.value.stat.additionsNum === 0 && diffChange.value.stat.deletionsNum === 0)
 
-const currentDiffIndex = ref(-1)
+const splitDiffViewer = ref<InstanceType<typeof SplitViewer> | null>(null)
 
-function goToNextDiff() {
-  const diffs = document.querySelectorAll('.blob-code-addition')
-  if (currentDiffIndex.value < diffs.length - 1) {
-    currentDiffIndex.value++
-    updateCurrentDiffHighlight(diffs)
-  }
+function jumpToChange(line: number) {
+  splitDiffViewer.value?.jumpToChange(line)
 }
 
-function goToPrevDiff() {
-  const diffs = document.querySelectorAll('.blob-code-addition')
-  if (currentDiffIndex.value > 0) {
-    currentDiffIndex.value--
-    updateCurrentDiffHighlight(diffs)
-  }
-}
-
-function updateCurrentDiffHighlight(diffs: NodeListOf<Element>) {
-  diffs.forEach((diff: { classList: { remove: (arg0: string) => any } }) => diff.classList.remove('current-diff'))
-
-  const currentDiff = diffs[currentDiffIndex.value]
-
-  if (currentDiff) {
-    currentDiff.classList.add('current-diff')
-    currentDiff.scrollIntoView({ behavior: 'smooth', block: 'center' })
-  }
-}
+defineExpose({
+  jumpToChange
+})
 
 watch(() => props, () => {
   diffChange.value = raw.value
+  const statistic: ChangeStat = {
+    equalCont: 0,
+    onlyCont: 0,
+    changeCont: 0,
+    ignoreCont: 0
+  }
+  const changedList: Array<number> = []
+  if (!isUnifiedViewer.value) {
+    let cStat = false
+    const { changes } = <SplitViewerChange>diffChange.value
+    for (let i = 0; i < changes.length; i++) {
+      const { left: { type: lType }, right: { type: rType } } = changes[i]
+      if (lType === DiffType.EQUAL && rType === DiffType.EQUAL) {
+        // 两边都是equal的算相同的行
+        statistic.equalCont++
+      } else if (
+        (lType === DiffType.IGNORE && rType != DiffType.EMPTY) ||
+        (lType != DiffType.EMPTY && rType === DiffType.IGNORE)
+      ) {
+        // 一边是ignore，另一边不为empty的，算忽略，并加到相同里面
+        statistic.ignoreCont++
+        statistic.equalCont++
+      } else if (lType === DiffType.DELETE && rType === DiffType.ADD) {
+        // 左边delete右边add的算改变的行
+        statistic.changeCont++
+      } else {
+        // 其他的全算唯一的行
+        statistic.onlyCont++
+      }
+      // 统计变更块
+      if (!cStat && lType !== rType) {
+        changedList.push(i)
+        cStat = true
+      }
+      if (cStat && lType === rType) {
+        cStat = false
+      }
+    }
+  }
+  console.log('diffchange--', diffChange.value)
   emits('diff', {
-    stat: {
-      isChanged: !isNotChanged.value,
-      addNum: diffChange.value.stat.additionsNum,
-      delNum: diffChange.value.stat.deletionsNum,
-    },
+    diffChange: changedList,
+    stat: statistic
   })
 }, { deep: true, immediate: true })
 </script>
@@ -130,14 +149,6 @@ watch(() => props, () => {
           <div class="info-left">{{ filename }}</div>
           <div class="info-left">{{ newFilename }}</div>
         </span>
-        <span class="diff-commandbar">
-          <button class="command-item-button" title="Next Change" @click="goToNextDiff">
-            <DownArrowIcon />
-          </button>
-          <button class="command-item-button" title="Previous Change" @click="goToPrevDiff">
-            <UpArrowIcon />
-          </button>
-        </span>
         <span v-if="!hideStat" class="diff-stat">
           <slot name="stat" :stat="diffChange.stat">
             <span class="diff-stat-added">+{{ diffChange.stat.additionsNum }} additions</span>
@@ -150,14 +161,6 @@ watch(() => props, () => {
         <span class="info-left">{{ filename }}</span>
         <span class="info-right">
           <span style="margin-left: 20px;">{{ newFilename }}</span>
-          <span class="diff-commandbar">
-            <button class="command-item-button" title="Next Change" @click="goToNextDiff">
-              <DownArrowIcon />
-            </button>
-            <button class="command-item-button" title="Previous Change" @click="goToPrevDiff">
-              <UpArrowIcon />
-            </button>
-          </span>
           <span v-if="!hideStat" class="diff-stat">
             <slot name="stat" :stat="diffChange.stat">
               <span class="diff-stat-added">+{{ diffChange.stat.additionsNum }} additions</span>
@@ -168,7 +171,7 @@ watch(() => props, () => {
       </div>
     </div>
     <UnifiedViewer v-if="isUnifiedViewer" :diff-change="diffChange" />
-    <SplitViewer v-else :diff-change="diffChange" />
+    <SplitViewer v-else ref="splitDiffViewer" :diff-change="diffChange" :context="context" />
   </div>
 </template>
 

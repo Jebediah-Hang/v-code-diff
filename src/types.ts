@@ -3,6 +3,7 @@ export enum DiffType {
   DELETE = 'removed',
   ADD = 'added',
   EMPTY = 'empty',
+  IGNORE = 'ignore'
 }
 
 export interface UnifiedLineUnchanges {

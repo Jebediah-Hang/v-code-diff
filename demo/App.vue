@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { version } from 'vue-demi'
 import { reactive, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { newShortText } from './text/new-short-text'
 import { oldShortText } from './text/old-short-text'
 
@@ -11,7 +10,6 @@ const formState = reactive({
   language: 'json',
   theme: 'light',
   diffStyle: 'word',
-  forceInlineComparison: false,
   outputFormat: 'side-by-side',
   context: 10,
   trim: false,
@@ -20,7 +18,6 @@ const formState = reactive({
   newFilename: 'newPackage.json',
   hideHeader: false,
   hideStat: false,
-  maxHeight: '',
 })
 
 const oldString = ref(oldShortText.value)
@@ -37,14 +34,12 @@ function resetText() {
   oldString.value = oldShortText.value
   newString.value = newShortText.value
 }
-
 function clearText() {
   localStorage.removeItem('oldString')
   localStorage.removeItem('newString')
   oldString.value = ''
   newString.value = ''
 }
-
 watch(oldString, () => localStorage.setItem('oldString', oldString.value))
 watch(newString, () => localStorage.setItem('newString', newString.value))
 
@@ -54,27 +49,18 @@ function printEvent(e) {
   // eslint-disable-next-line no-console
   console.log(e)
 }
-
-const { locale, t } = useI18n()
-
-function toggleLang() {
-  locale.value = locale.value === 'en' ? 'cn' : 'en'
-}
 </script>
 
 <template>
   <div style="padding:10px 35px">
     <div class="banner">
       <h1>v-code-diff</h1>
-      <p>{{ t('desc') }}</p>
+      <p>A code diff display plugin, available for Vue2 / Vue3.</p>
       <p align="center">
-        Vue ver: {{ version }}. CodeDiff ver: {{ appVersion }}
+        Vue version: {{ version }}. CodeDiff version: {{ appVersion }}
       </p>
       <a-button type="primary">
-        <a href="https://github.com/Shimada666/v-code-diff">GitHub</a>
-      </a-button>
-      <a-button v-model="locale" style="margin-left: 5px; width: 100px" @click="toggleLang">
-        {{ t('tools.lang') }}
+        <a href="https://github.com/Shimada666/v-code-diff">View on Github</a>
       </a-button>
     </div>
     <div style="display: flex; justify-content: space-between;">
@@ -89,18 +75,17 @@ function toggleLang() {
     </div>
     <div style="margin-top: 10px;">
       <a-button style="margin-right: 5px;" @click="resetText">
-        {{ t('tools.resetText') }}
+        重置文本(reset text)
       </a-button>
       <a-button type="default" @click="clearText">
-        {{ t('tools.clearText') }}
+        清空文本(clear text)
       </a-button>
     </div>
-    <a-card style="margin-top:15px" :title="t('options.title')">
+    <a-card style="margin-top:15px" title="Options">
       <a-form layout="inline" :model="formState">
         <a-row :gutter="16">
           <a-col :md="8" :sm="24">
-            <a-form-item>
-              <slot><span class="form-item-label">{{ t('options.language') }}</span> </slot>
+            <a-form-item label="语言(langauge)">
               <a-select v-model:value="formState.language" style="width: 12vw;">
                 <a-select-option
                   v-for="item in ['plaintext', 'json', 'yaml', 'javascript', 'java', 'python', 'sql', 'xml', 'bash']"
@@ -112,84 +97,64 @@ function toggleLang() {
             </a-form-item>
           </a-col>
           <a-col :md="8" :sm="24">
-            <a-form-item>
-              <slot><span class="form-item-label">{{ t('options.theme') }}</span> </slot>
+            <a-form-item label="主题模式(theme)">
               <a-radio-group v-model:value="formState.theme">
                 <a-radio value="light">
-                  {{ t('options.dayMode') }}
+                  日间模式(light)
                 </a-radio>
                 <a-radio value="dark">
-                  {{ t('options.nightMode') }}
+                  夜间模式(dark)
                 </a-radio>
               </a-radio-group>
             </a-form-item>
           </a-col>
           <a-col :md="8" :sm="24">
-            <a-form-item>
-              <slot><span class="form-item-label">{{ t('options.contextRange') }}</span> </slot>
+            <a-form-item label="差异化范围(context)">
               <a-input-number v-model:value="formState.context" :min="0" style="width: 12vw;" />
             </a-form-item>
           </a-col>
           <a-col :md="8" :sm="24">
-            <a-form-item>
-              <slot><span class="form-item-label">{{ t('options.outputFormat') }}</span> </slot>
+            <a-form-item label="显示方式(outputFormat)">
               <a-radio-group v-model:value="formState.outputFormat">
                 <a-radio value="line-by-line">
-                  {{ t('options.lineByLine') }}
+                  line-by-line
                 </a-radio>
                 <a-radio value="side-by-side">
-                  {{ t('options.sideBySide') }}
+                  side-by-side
                 </a-radio>
               </a-radio-group>
             </a-form-item>
           </a-col>
           <a-col :md="8" :sm="24">
-            <a-form-item>
-              <slot><span class="form-item-label">{{ t('options.diffStyle') }}</span> </slot>
+            <a-form-item label="差异级别(diffStyle)">
               <a-radio-group v-model:value="formState.diffStyle">
                 <a-radio value="word">
-                  {{ t('options.word') }}
+                  word
                 </a-radio>
                 <a-radio value="char">
-                  {{ t('options.char') }}
+                  char
                 </a-radio>
               </a-radio-group>
             </a-form-item>
           </a-col>
           <a-col :md="8" :sm="24">
-            <a-form-item>
-              <slot><span class="form-item-label">{{ t('options.trim') }}</span> </slot>
+            <a-form-item label="移除字符串前后空白字符(trim)">
               <a-switch v-model:checked="formState.trim" />
             </a-form-item>
           </a-col>
           <a-col :md="8" :sm="24">
-            <a-form-item>
-              <slot><span class="form-item-label">{{ t('options.noDiffLineFeed') }}</span> </slot>
+            <a-form-item label="不 diff 换行符(noDiffLineFeed)">
               <a-switch v-model:checked="formState.noDiffLineFeed" />
             </a-form-item>
           </a-col>
           <a-col :md="8" :sm="24">
-            <a-form-item>
-              <slot><span class="form-item-label">{{ t('options.hideHeader') }}</span> </slot>
+            <a-form-item label="隐藏首部(hide Header)">
               <a-switch v-model:checked="formState.hideHeader" />
             </a-form-item>
           </a-col>
           <a-col :md="8" :sm="24">
-            <a-form-item>
-              <slot><span class="form-item-label">{{ t('options.hideStatistics') }}</span> </slot>
+            <a-form-item label="隐藏统计信息(hide Statistics)">
               <a-switch v-model:checked="formState.hideStat" />
-            </a-form-item>
-          </a-col>
-          <a-col :md="8" :sm="24">
-            <a-form-item>
-              <slot><span class="form-item-label">{{ t('options.forceInlineComparison') }}</span> </slot>
-              <a-switch v-model:checked="formState.forceInlineComparison" />
-            </a-form-item>
-          </a-col>
-          <a-col :md="8" :sm="24">
-            <a-form-item>
-              <slot><span class="form-item-label">{{ t('options.maxHeight') }}</span> </slot>
-              <a-input v-model:value="formState.maxHeight" placeholder="500px" style="width: 12vw;" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -198,10 +163,10 @@ function toggleLang() {
     <div>
       <CodeDiff
         :theme="formState.theme" :old-string="oldString" :new-string="newString" :language="formState.language"
-        :diff-style="formState.diffStyle" :force-inline-comparison="formState.forceInlineComparison" :output-format="formState.outputFormat" :context="formState.context"
+        :diff-style="formState.diffStyle" :output-format="formState.outputFormat" :context="formState.context"
         :trim="formState.trim" :no-diff-line-feed="formState.noDiffLineFeed" :filename="formState.filename"
         :new-filename="formState.newFilename" :hide-header="formState.hideHeader" :hide-stat="formState.hideStat"
-        :max-height="formState.maxHeight" @diff="printEvent"
+        @diff="printEvent"
       />
     </div>
   </div>
@@ -227,21 +192,5 @@ function toggleLang() {
 .banner p {
   font-size: 16px;
   color: #666;
-}
-
-.form-item-label {
-  display: inline-block;
-  flex-grow: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-align: right;
-  vertical-align: middle;
-}
-
-.form-item-label:after {
-  content: ":";
-  position: relative;
-  top: -0.5px;
-  margin: 0 8px 0 2px;
 }
 </style>

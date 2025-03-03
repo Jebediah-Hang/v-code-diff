@@ -7,22 +7,19 @@
   }
 
   position: relative;
-  margin-top: 16px;
-  margin-bottom: 16px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  border-radius: 4px;
   border: 1px solid var(--color-border-default, #ddd);
-  border-radius: 6px;
-
   overflow-y: auto;
 
   .file-header {
-    position: sticky;
-    top: 0;
-    z-index: 1;
     background-color: var(--color-canvas-subtle);
     border-bottom: 1px solid var(--color-border-default);
     padding: 8px 16px;
     font-size: 12px;
-    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+    font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
+
     .file-info {
       display: flex;
       justify-content: space-between;
@@ -51,25 +48,6 @@
         }
         .diff-stat-ignored {
           color: var(--color-fg-subtle);
-        }
-      }
-
-      .diff-commandbar {
-        margin-left: auto;
-        margin-right: 1rem;
-        
-        .command-item-button {
-          background-color: transparent;
-          color: var(--color-fg-subtle);
-          border: none;
-
-          svg {
-            fill: var(--color-fg-subtle);          
-          }
-        }
-
-        .command-item-button:hover {
-          background-color: var(--color-btn-outline-hover-border);
         }
       }
     }
@@ -108,6 +86,11 @@
       background-color: var(--color-diff-blob-addition-num-bg);
       border-color: var(--color-success-emphasis);
     }
+    .blob-num-ignore {
+      color: var(--color-diff-blob-ignore-num-text);
+      background-color: var(--color-diff-blob-ignore-num-bg);
+      border-color: var(--color-success-emphasis);
+    }
 
     .blob-code {
       position: relative;
@@ -143,11 +126,12 @@
         background-color: var(--color-diff-blob-addition-word-bg);
       }
     }
-    
-    .current-diff {
-      border: 1px solid var(--color-border-muted);
+    .blob-code-ignore {
+      background-color: var(--color-diff-blob-ignore-line-bg);
+      outline: 1px dotted transparent;
     }
 
+    .blob-code-ignore,
     .blob-code-context,
     .blob-code-addition,
     .blob-code-deletion {

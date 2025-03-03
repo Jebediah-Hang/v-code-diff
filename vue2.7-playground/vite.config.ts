@@ -8,6 +8,7 @@ export const viteVue2Config = defineConfig({
   plugins: [vue2(), ...defaultPlugins],
   server: {
     port: 2700,
+    host: '0.0.0.0'
   },
   resolve: {
     alias: {

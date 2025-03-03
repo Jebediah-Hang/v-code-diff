@@ -3,7 +3,8 @@ import { DiffType } from '../types'
 import type { SplitLineChange } from '../types'
 
 defineProps<{
-  splitLine: SplitLineChange
+  splitLine: SplitLineChange,
+  context: number
 }>()
 
 const emit = defineEmits(['expand'])
@@ -13,6 +14,9 @@ function getCodeMarker(type: DiffType) {
     return '-'
   if (type === DiffType.ADD)
     return '+'
+  if (type === DiffType.IGNORE) {
+    return '·'
+  }
   return ''
 }
 
@@ -31,7 +35,7 @@ function onSplitLineMousedown(side: 'left' | 'right') {
 </script>
 
 <template>
-  <tr v-if="splitLine.hideIndex !== undefined && splitLine.hide">
+  <tr v-if="splitLine.hideIndex !== undefined && splitLine.hide && context">
     <td class="blob-num blob-num-hunk" colspan="1" @click="emit('expand', splitLine)">
       >
     </td>
@@ -53,6 +57,7 @@ function onSplitLineMousedown(side: 'left' | 'right') {
             'blob-num-deletion': line.type === DiffType.DELETE,
             'blob-num-addition': line.type === DiffType.ADD,
             'blob-num-context': line.type === DiffType.EQUAL,
+            'blob-num-ignore': line.type === DiffType.IGNORE,
             'blob-num-hunk': splitLine.hide !== undefined,
           }"
         >
@@ -64,6 +69,7 @@ function onSplitLineMousedown(side: 'left' | 'right') {
             'blob-code-deletion': line.type === DiffType.DELETE,
             'blob-code-addition': line.type === DiffType.ADD,
             'blob-code-context': line.type === DiffType.EQUAL,
+            'blob-code-ignore': line.type === DiffType.IGNORE,
             'blob-code-hunk': splitLine.hide !== undefined,
             'split-side-left': index === 0,
             'split-side-right': index === 1,

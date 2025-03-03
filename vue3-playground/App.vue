@@ -1,21 +1,18 @@
 <script lang="ts" setup>
 import { version } from 'vue-demi'
 import { reactive } from 'vue'
-import c from 'highlight.js/lib/languages/c'
-import { CodeDiff, hljs } from '../src/index'
 
-hljs.registerLanguage('c', c)
 // import { oldLongText } from '../demo/text/old-long-text'
 // import { newLongText } from '../demo/text/new-long-text'
 
 const form = reactive({
   // oldString: oldLongText,
   // newString: newLongText,
-  oldString: '#include <stdio.h>',
-  newString: '123\n123',
+  oldString: '{\n  "code": "200",\n  "msg": "请求成功",\n  "data": {\n    "hitokoto": "往者不可谏，来者犹可追。",\n    "from": "论语·微子篇"\n  },\n  "time": "2024-01-12 17:27:03"\n}',
+  newString: '{\n  "code": "200",\n  "msg": "请求成功",\n  "data": {\n    "hitokoto": "成熟的人眼里满是前途，稚嫩的人眼里满是爱恨情仇。",\n    "from": "网易云热评"\n  },\n  "time": "2024-01-12 17:27:06"\n}',
   filename: 'oldFile',
   newFilename: 'newFile',
-  language: 'c',
+  language: 'json',
   diffStyle: 'word',
   outputFormat: 'side-by-side',
   ignoreMatchingLines: 'time',
